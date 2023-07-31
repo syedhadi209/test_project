@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+<span></span>
+{% block content %}
+<div class="container d-flex flex-column align-items-center justify-content-center">
+    <form action="" method="post" enctype="multipart/form-data">
+        {{form.hidden_tag()}}
+        <fieldset class="form-group">
+            <legend class="mb-4 p-4">Update Post</legend>
+            <div class="input-group input-group-lg d-flex flex-column justify-content-left align-items-start mb-3">
+                {{form.title.label}}
+              {{form.title(placeholder="Title",class="p-2 border rounded-t-sm w-100")}}
+            </div>
+            <div class="input-group input-group-lg d-flex flex-column justify-content-left align-items-start mb-3">
+                {{form.content.label}}
+              {{form.content(placeholder="Content",class="p-2 border w-100")}}
+            </div>
+            <div class="input-group input-group-lg d-flex flex-column justify-content-left align-items-start">
+                {{form.attachment.label}}
+              {{form.attachment(placeholder="Attachment",class="p-2 border")}}
+            </div>
+            </div>
+          </fieldset>
+          <div class="form-group">
+              {{form.submit(class="btn btn-outline-info mt-4")}}
+          </div>
+    </form>
+</div>
+{% endblock content%}

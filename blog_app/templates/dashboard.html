@@ -1,0 +1,359 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="container-fluid mt-4 position-relative">
+  <div
+    class="offcanvas offcanvas-start"
+    data-bs-scroll="true"
+    data-bs-backdrop="false"
+    tabindex="-1"
+    id="offcanvasScrolling"
+    aria-labelledby="offcanvasScrollingLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+        {%if current_user.role == 'user'%} Your Suggestions on others Post
+        {%else%} Available Users {%endif%}
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="offcanvas"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="list-group">
+        {%if current_user.role == 'user'%} {% for suggestion in
+        suggestions.query.filter_by(user_id=current_user.id)%}
+        <a
+          href="{{url_for('give_suggesstion',userId=current_user.id, postId=suggestion.post_id)}}"
+        >
+          <li class="list-group-item" style="text-transform: uppercase">
+            {{suggestion.content}}
+          </li>
+        </a>
+        {%endfor%} {%else%} {%for user in
+        Users.query.filter_by(role='user').union(Users.query.filter_by(role='moderator')).all()%}
+        <li class="list-group-item" style="text-transform: uppercase">
+          <div class="row">
+            <div class="col text-start">
+              <strong>{{user.username}}</strong>
+            </div>
+            <div class="col text-end">
+              <button
+                style="background: transparent; border: none"
+                onclick="openUserInfo('{{user.id}}')"
+              >
+                <i class="fa-solid fa-caret-down"></i>
+              </button>
+            </div>
+          </div>
+        </li>
+        <div
+          id="user_info_{{user.id}}"
+          style="border: 1px solid grey; padding: 5px; display: none"
+        >
+          <div class="row">
+            <div class="col text-start">
+              <p><strong>Username</strong> : {{user.username}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-start">
+              <p>
+                <strong>Role</strong> :
+                <span id="role-{{user.id}}">{{user.role}}</span>
+              </p>
+            </div>
+            <div class="col">
+              <select name="Change Role" id="user-role-{{user.id}}">
+                <option value="admin">Admin</option>
+                <option value="moderator">Moderator</option>
+                <option value="user">User</option>
+              </select>
+              <button
+                class="btn btn-success btn-sm"
+                style="border-radius: 50%"
+                onclick="updateUserRole('{{user.id}}')"
+              >
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        {%endfor%} {%endif%}
+      </ul>
+    </div>
+  </div>
+  {% if not Users.query.get(current_user.id).admin%}
+  <div class="container-fluid" style="display: flex; justify-content: end">
+    <a href="{{url_for('new_post')}}" class="btn btn-success"
+      >Create New Post</a
+    >
+  </div>
+  {% endif %} {%if current_user.role == 'admin'%}
+  <h2>Admin Dashboard</h2>
+  {% endif %}
+  <div class="user-data">
+    {% if posts | length > 0 %} {% for post in posts %} {% if post.approved or
+    current_user.role == 'admin' or current_user.role == 'moderator'%}
+    <div class="custom-container">
+      {%if current_user.role == 'admin' or current_user.role=='moderator'%}
+      <div
+        class="verified"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #331d2c;
+          padding: 5px;
+          padding-right: 20px;
+        "
+      >
+        <p style="color: white; margin-top: 10px; margin-left: 10px">
+          Approval
+        </p>
+        {%if not post.approved%}
+        <a
+          class="btn btn-success btn-sm"
+          id="approval-{{post.post_id}}"
+          onclick="approval('{{post.post_id}}')"
+          >Approve</a
+        >
+        {%else%}
+        <a
+          class="btn btn-success btn-sm"
+          id="approval-{{post.post_id}}"
+          onclick="approval('{{post.post_id}}')"
+          >Disapprove</a
+        >
+        {%endif%}
+      </div>
+      {%endif%}
+      <div class="author">
+        <p style="text-transform: capitalize">
+          <b>Author : </b>{{post.user.username}}
+        </p>
+        {% if post.user_id == current_user.id or current_user.role == 'admin'%}
+        <div class="icons-delete-update">
+          <a href="{{url_for('update_post', postId=post.post_id)}}"
+            ><i class="fa-sharp fa-solid fa-pen"></i
+          ></a>
+          <a href="{{url_for('delete_post', postId=post.post_id)}}"
+            ><i class="fa-solid fa-trash"></i
+          ></a>
+          <a
+            href="{{url_for('give_suggesstion',userId=current_user.id, postId=post.post_id)}}"
+          >
+            <i class="fa-solid fa-list-check"></i>
+          </a>
+        </div>
+        {% endif %} {% if post.user_id != current_user.id %}
+        <a
+          href="{{url_for('give_suggesstion',userId=current_user.id, postId=post.post_id)}}"
+          class="btn btn-success btn-sm ms-2"
+          >Suggestion</a
+        >
+        {% endif %}
+      </div>
+      <div class="text-data">
+        <h2>{{post.title}}</h2>
+        <p>{{post.content}}</p>
+      </div>
+      <div class="post-attachment" style="text-align: center">
+        {% if post.attachement %}
+        <img src="{{post.attachement}}" alt="{{post.title}}" />
+        {% else %}
+        <img
+          src="{{url_for('static',filename='images/dummy_post.png')}}"
+          alt="dummy_image"
+        />
+        {%endif%}
+      </div>
+      <div class="like-comment">
+        <div class="like">
+          <a
+            onclick="performPost('{{post.post_id}}','{{current_user.id}}', 'post')"
+          >
+            {% if Likes.query.filter_by(user_id=current_user.id,
+            parent_id=post.post_id,parent_type='post').all() | length > 0 %}
+            <i
+              class="fa-solid fa-heart"
+              style="color: red"
+              id="heart-icon-{{post.post_id}}"
+            ></i>
+            {% else %}
+            <i class="fa-regular fa-heart" id="heart-icon-{{post.post_id}}"></i>
+            {% endif %}
+          </a>
+          <p id="likes-count-{{post.post_id}}">
+            {{Likes.query.filter_by(parent_id=post.post_id,parent_type="post").all()
+            | length}} Likes
+          </p>
+        </div>
+        <div class="comment-field">
+          <form action="" method="post" style="width: 100%">
+            {{form.hidden_tag()}}
+            <span></span>
+            {{form.comment(placeholder="Write Comment",id="comment-value")}}
+            <input type="hidden" name="post-id" value="{{post.post_id}}" />
+            <input type="hidden" name="parent-type" value="post" />
+
+            {{form.submit(class="btn btn-success", style="width:30%;")}}
+          </form>
+        </div>
+        <div class="comments">
+          {% for comment in Comments.query.filter_by(parent_id=post.post_id,
+          parent_type='post') %}
+          <div class="comment-body">
+            <div class="comment-upper">
+              <div class="comment-left">
+                <img
+                  src="{{url_for('static',filename='images/avatar.jpeg')}}"
+                  alt=""
+                  class="rounded-circle"
+                  style="width: 50px; height: 100%"
+                  loading="lazy"
+                />
+                <div class="comment-data">
+                  <p style="margin: 0 !important">
+                    <b style="text-transform: uppercase"
+                      >{{comment.user.username}}</b
+                    >
+                  </p>
+                  <p>{{comment.content}}</p>
+                </div>
+              </div>
+              <div class="comment-right">
+                <a
+                  onclick="performPost('{{post.post_id}}','{{current_user.id}}', 'comment')"
+                  >{% if Likes.query.filter_by(user_id=current_user.id,
+                  parent_id=comment.comment_id,parent_type='comment').all() |
+                  length > 0 %}
+                  <i
+                    class="fa-solid fa-heart"
+                    id="comment-heart-icon-{{post.post_id}}"
+                    style="color: red"
+                  ></i>
+                  {% else %}
+                  <i
+                    class="fa-regular fa-heart"
+                    id="comment-heart-icon-{{post.post_id}}"
+                  ></i>
+                  {% endif %}
+                </a>
+                <a
+                  href="{{url_for('reply',parentId=comment.comment_id, parentType='comment',postId=post.post_id)}}"
+                >
+                  <i class="fa-regular fa-comment"></i>
+                </a>
+              </div>
+            </div>
+            <div class="replies">
+              {% for reply in
+              Comments.query.filter_by(parent_id=comment.comment_id,parent_type='comment')%}
+              <div class="replied" style="border-bottom: 1px solid gray">
+                <p>{{reply.content}}</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {%elif post.approved == False%}
+    <div class="custom-container">
+      <p>Post Not Approved by the Admins</p>
+    </div>
+    {% endif %} {% endfor %} {% else %}
+    <h3>No Posts To Show</h3>
+    {% endif %}
+  </div>
+</div>
+{% endblock content%} {% block script %}
+<script>
+  function performPost(postId, userId, parentType) {
+    if (parentType == "post") {
+      heart_icon = document.getElementById(`heart-icon-${postId}`);
+      likes_count = document.getElementById(`likes-count-${postId}`);
+      $.ajax({
+        type: "POST",
+        url: "{{url_for('like')}}",
+        data: { postId: postId, userId: userId, parentType: parentType },
+        success: (data) => {
+          if (data["isLiked"]) {
+            heart_icon.classList.remove("fa-regular", "fa-heart");
+            heart_icon.classList.add("fa-solid", "fa-heart");
+            heart_icon.style.color = "red";
+            likes_count.innerText = `${data["likesCount"]} Likes`;
+          } else {
+            heart_icon.classList.remove("fa-solid", "fa-heart");
+            heart_icon.classList.add("fa-regular", "fa-heart");
+            heart_icon.style.color = "black";
+            likes_count.innerText = `${data["likesCount"]} Likes`;
+          }
+        },
+      }).then((data) => {});
+    }
+    if (parentType == "comment") {
+      heart_icon = document.getElementById(`comment-heart-icon-${postId}`);
+      $.ajax({
+        type: "POST",
+        url: "{{url_for('like')}}",
+        data: { postId: postId, userId: userId, parentType: parentType },
+        success: (data) => {
+          console.log(data);
+          if (data["isLiked"]) {
+            heart_icon.classList.remove("fa-regular", "fa-heart");
+            heart_icon.classList.add("fa-solid", "fa-heart");
+            heart_icon.style.color = "red";
+          } else {
+            heart_icon.classList.remove("fa-solid", "fa-heart");
+            heart_icon.classList.add("fa-regular", "fa-heart");
+            heart_icon.style.color = "black";
+          }
+        },
+      }).then((data) => {});
+    }
+  }
+
+  function approval(postId) {
+    app = document.getElementById(`approval-${postId}`);
+    $.ajax({
+      type: "POST",
+      url: "{{url_for('approve_post')}}",
+      data: { postId: postId },
+      success: (data) => {
+        if (data.approved) {
+          app.innerText = "Disapprove";
+        } else if (!data.approved) {
+          app.innerText = "Approve";
+        }
+      },
+    });
+  }
+
+  function openUserInfo(userId) {
+    userInfo = document.getElementById(`user_info_${userId}`);
+    if (userInfo.style.display == "none") {
+      userInfo.style.display = "block";
+    } else if (userInfo.style.display == "block") {
+      userInfo.style.display = "none";
+    }
+  }
+
+  function updateUserRole(userId) {
+    userRole = document.getElementById(`user-role-${userId}`);
+    role = document.getElementById(`role-${userId}`);
+    userRolevalue = userRole.value;
+    $.ajax({
+      type: "POST",
+      url: "{{url_for('update_user_role')}}",
+      data: { userId: userId, role: userRolevalue },
+      success: (data) => {
+        role.innerText = data.role;
+      },
+    });
+  }
+</script>
+{% endblock script %}

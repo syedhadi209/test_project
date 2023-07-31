@@ -1,0 +1,179 @@
+.custom-container {
+  border: 1px solid #c4dfdf;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: baseline; */
+  width: 100%;
+  min-height: 400px;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  max-width: 400px;
+}
+
+.author {
+  width: 100%;
+  padding: 10px 20px !important;
+  background: #176b87;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.author p {
+  width: 100%;
+  text-align: left;
+  margin: 0 !important;
+}
+
+.user-data {
+  /* display: grid; */
+  display: flex;
+  gap: 50px;
+  margin-top: 30px;
+  grid-template-columns: 500px;
+  max-width: 1200px;
+  margin: 30px auto 0 auto;
+  justify-content: center;
+  padding: 30px 0;
+  flex-wrap: wrap;
+}
+
+.text-data {
+  width: 100%;
+  padding: 10px 20px;
+  text-align: left;
+}
+
+.text-data h2 {
+  text-transform: capitalize;
+}
+
+.like-comment {
+  border-top: 1px solid #c4dfdf;
+  width: 100%;
+  text-align: left;
+}
+
+.like {
+  margin: 10px 0 10px 20px;
+  display: flex;
+  gap: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.like a {
+  color: black;
+}
+
+.like i {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.comment-field form {
+  display: flex;
+  gap: 5px;
+}
+
+.comment-field {
+  padding: 0 20px;
+  display: flex;
+  gap: 5px;
+}
+
+.comment-field input {
+  width: 100%;
+  border: 1px solid #dee2e6;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.comments {
+  padding: 20px 20px;
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #c4dfdf;
+  margin-top: 10px;
+}
+
+.post-attachment {
+  background: aliceblue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.post-attachment img {
+  width: fit-content;
+  height: 300px;
+}
+
+.icons-delete-update {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.icons-delete-update a {
+  text-decoration: none;
+  color: white;
+}
+
+/* .icons-delete-update a:first-child {
+  margin-right: 10px;
+} */
+
+.comment-left {
+  display: flex;
+  height: 100%;
+  gap: 10px;
+}
+
+.comment-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.comment-right a {
+  text-decoration: none;
+  color: black;
+}
+
+.comment-right button {
+  background: transparent;
+  border: none;
+}
+
+.comment-upper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-lower {
+  text-align: center;
+  display: none;
+}
+
+.comment-section {
+  display: flex;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.h-container {
+  border: 1px solid black;
+}
+
+@media screen and (max-width: 550px) {
+  .user-data {
+    grid-template-columns: auto;
+  }
+}

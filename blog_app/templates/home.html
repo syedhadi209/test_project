@@ -1,0 +1,14 @@
+{% extends 'layout.html' %} {% block content %}
+<div
+  class="container d-flex flex-column justify-content-center align-items-center"
+  style="height: 90vh"
+>
+  <h1>Welcome To Our Blog</h1>
+  <p>Lets Start Your Journey With Us</p>
+  <div class="buttons">
+    <a class="btn btn-primary me-3" href="{{url_for('login')}}">Log In</a>
+    <a class="btn btn-secondary" href="{{url_for('sign_up')}}">Sign Up</a>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,124 @@
+{% extends 'layout.html' %}
+<span></span>
+{% block content %}
+<div class="container text-center">
+  {% if current_user.role == 'admin'%}
+  <h2 class="mt-3">Admin Dashboard</h2>
+  {% endif %}
+  <div class="row">
+    <div class="col-4">
+      <div class="card mt-5" style="width: 18rem">
+        <img
+          class="card-img-top"
+          src="{% if post.attachement %}{{post.attachement}}{%else%}{{url_for('static',filename='images/dummy_post.png')}}{%endif%}"
+          alt="Card image cap"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{post.title}}</h5>
+          <p class="card-text">{{post.content}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="col">
+        <div class="row">
+          <div
+            class="h-container"
+            style="
+              border: 1px solid black;
+              text-align: left;
+              padding: 10px;
+              margin-top: 50px;
+              border-radius: 10px;
+            "
+          >
+            <h3>Give Suggesstions</h3>
+            {% if post.user_id != current_user.id%}
+            <div class="suggesstion-input">
+              <form action="" method="post">
+                {{form.hidden_tag()}} {{form.suggesstion(style="width: 100%;
+                margin-bottom: 10px",placeholder="Enter Suggesstion")}}
+                {{form.submit(class="btn btn-success")}}
+              </form>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="h-container"
+            style="
+              border: 1px solid black;
+              text-align: left;
+              padding: 10px;
+              margin-top: 50px;
+              border-radius: 10px;
+            "
+          >
+            <ul class="list-group">
+              {% for data in suggestions%}
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span
+                  ><b style="text-transform: uppercase"
+                    >{{data.user.username}} =>
+                  </b>
+                  {{data.content}}</span
+                >
+                <div>
+                  {% if post.user_id == current_user.id or current_user.role ==
+                  'admin'%}
+                  <a
+                    href="{{url_for('reject_suggesstion', sId=data.s_id, userId=data.user_id, postId=data.post_id)}}"
+                    class="btn btn-danger"
+                    ><i class="fa-solid fa-trash"></i
+                  ></a>
+                  {%else%} {% endif %}
+                  <a
+                    href="{{url_for('reply',parentId=data.s_id, parentType='suggestion',postId=post.post_id)}}"
+                    class="btn btn-success"
+                  >
+                    <i class="fa-solid fa-comment"></i>
+                  </a>
+                </div>
+              </li>
+              <div class="s-comments">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">Username</th>
+                      <th scope="col">Comments</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for comment in
+                    comments.query.filter_by(parent_id=data.s_id,
+                    parent_type='suggestion') %}
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>{{comment.user.username}}</td>
+                      <td>{{comment.content}}</td>
+                      <td>
+                        <a
+                          href="{{url_for('delete_reply',id=comment.comment_id,parentId=data.s_id, parentType='suggestion',postId=data.post_id)}}"
+                          class="btn btn-danger btn-sm"
+                          ><i class="fa-sharp fa-solid fa-xmark"></i
+                        ></a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

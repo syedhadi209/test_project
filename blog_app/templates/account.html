@@ -1,0 +1,35 @@
+{% extends 'layout.html' %} {% block content%}
+<div class="content-section p-5 text-start">
+  <div class="media">
+    <div class="media-body">
+      <h2 class="account-heading" style="text-transform: capitalize;">{{current_user.username}}</h2>
+      <p class="text-secondary">{{ current_user.email}}</p>
+    </div>
+  </div>
+  <!-- FORM HERE -->
+  <div class="container d-flex flex-column text-start" style="padding-left: 0 !important; margin-left:0 !important;">
+    <form action="" method="post">
+      {{form.hidden_tag()}}
+      <fieldset class="form-group">
+        <legend class="mb-2 ">Update Account Info</legend>
+        {% if form.email.errors %}
+          {% for error in form.email.errors %}
+            <div class="mb-2">
+              <span style="color: red;">{{error}}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+        <div class="input-group input-group-lg">
+          {{form.username(placeholder="Username",class="p-2 border rounded-t-sm")}}
+        </div>
+        <div class="input-group input-group-lg d-flex flex-column justify-content-left align-items-start">
+          {{form.email(placeholder="Email",class="p-2 border")}}
+        </div>
+        </div>
+      </fieldset>
+      <div class="form-group">
+          {{form.submit(class="btn btn-outline-info mt-4")}}
+      </div>
+    </form>
+  </div>
+{% endblock content%}
