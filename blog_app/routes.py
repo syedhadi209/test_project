@@ -11,6 +11,11 @@ from cloudinary.utils import cloudinary_url
 
 
 
+@app.before_request
+def before_request():
+    # Initialize the 'g' object with an empty dictionary for each request
+    g.user = {"role":""}
+
 @app.route('/')
 def home():
     return render_template('home.html', title='Home')
